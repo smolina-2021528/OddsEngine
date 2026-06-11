@@ -110,7 +110,6 @@ class MatchStats(TimestampMixin, Base):
     match_id: Mapped[int] = mapped_column(
         ForeignKey("matches.id", ondelete="CASCADE"),
         nullable=False,
-        index=True,
     )
 
     home_goals: Mapped[int | None] = mapped_column(Integer, nullable=True)
