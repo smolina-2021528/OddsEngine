@@ -1,11 +1,16 @@
 from __future__ import annotations
 
 from datetime import date
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, Date, ForeignKey, Index, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin
+
+if TYPE_CHECKING:
+    from app.models.match import Match
+    from app.models.team import Team, TeamSeason
 
 
 class Sport(TimestampMixin, Base):
@@ -19,6 +24,11 @@ class Sport(TimestampMixin, Base):
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
     leagues: Mapped[list[League]] = relationship(
+        back_populates="sport",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
+    teams: Mapped[list[Team]] = relationship(
         back_populates="sport",
         cascade="all, delete-orphan",
         passive_deletes=True,
@@ -87,6 +97,16 @@ class Season(TimestampMixin, Base):
     is_current: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     league: Mapped[League] = relationship(back_populates="seasons")
+    team_seasons: Mapped[list[TeamSeason]] = relationship(
+        back_populates="season",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
+    matches: Mapped[list[Match]] = relationship(
+        back_populates="season",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
 
     def __repr__(self) -> str:
         return (
